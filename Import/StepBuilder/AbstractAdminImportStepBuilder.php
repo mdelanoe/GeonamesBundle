@@ -43,20 +43,30 @@ abstract class AbstractAdminImportStepBuilder extends AbstractImportStepBuilder
         return new TxtReader($this->file);
     }
 
+    public function getCountryCodes()
+    {
+        return $this->countryCodes;
+    }
+
+    public function setCountryCodes(array $countryCodes)
+    {
+        $this->countryCodes = $countryCodes;
+    }
+
     public function buildEntity($value)
     {
         if (empty($value[3]))
             throw new SkipImportException("Admin level '{$value[0]}' not imported because is no longer bound to a toponym");
-
-        /* @var $toponym \Giosh94mhz\GeonamesBundle\Entity\Toponym */
-        if (! ($toponym = $this->toponymRepository->find($value[3])))
-            throw new MissingToponymException("Skipped '{$value[0]}' due to missing toponym '{$value[3]}'");
 
         try {
             $codes = explode('.', $value[0]);
 
             if (!empty($this->countryCodes) && !in_array($codes[0], $this->countryCodes))
                 throw new SkipImportException("Skipped admin level '{$value[0]}' because country '{$codes[0]}' is not enabled");
+
+            /* @var $toponym \Giosh94mhz\GeonamesBundle\Entity\Toponym */
+            if (! ($toponym = $this->toponymRepository->find($value[3])))
+                throw new MissingToponymException("Skipped '{$value[0]}' due to missing toponym '{$value[3]}' {$codes[0]}");
 
             $value = array_merge($value, $codes);
 
@@ -65,7 +75,10 @@ abstract class AbstractAdminImportStepBuilder extends AbstractImportStepBuilder
             return $admin;
 
         } catch (\Exception $e) {
-            $this->om->detach($toponym);
+            if (isset($toponym) && $toponym) {
+                $this->om->detach($toponym);
+            }
+
             throw $e;
         }
     }
