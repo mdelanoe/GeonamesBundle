@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
-  <entity name="Giosh94mhz\GeonamesBundle\Entity\AlternateName" table="alternate_name">
+  <entity name="Giosh94mhz\GeonamesBundle\Entity\AlternateName" table="geonames_alternate_name">
     <id name="id" type="integer" column="alternate_name_id"/>
     <many-to-one field="toponym" target-entity="Toponym" inversed-by="alternateNames">
       <!-- FIXME: detach cascade is REQUIRED on import (for performance), but is not required for production use -->
