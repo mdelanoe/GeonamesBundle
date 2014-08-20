@@ -6,6 +6,7 @@ use Giosh94mhz\GeonamesBundle\Model\Import\DownloadAdapter;
 use Giosh94mhz\GeonamesBundle\Exception\MissingToponymException;
 use Giosh94mhz\GeonamesBundle\Import\FileReader\ZipReader;
 use Giosh94mhz\GeonamesBundle\Entity\HierarchyLink;
+use Giosh94mhz\GeonamesBundle\Exception\SkipImportException;
 
 /**
  *
@@ -65,7 +66,7 @@ class HierarchyImportStepBuilder extends AbstractImportStepBuilder
             $child = $this->toponymRepository->find($value[1]);
 
             if (! $parent || ! $child)
-                throw new MissingToponymException("HierarchyLink not imported due to missing toponym '$value[0]=>$value[1]'");
+                throw new SkipImportException("HierarchyLink not imported due to missing toponym '$value[0]=>$value[1]'");
 
             /* @var $link \Giosh94mhz\GeonamesBundle\Entity\HierarchyLink */
             $link = $this->repository->find(array('parent' => $parent->getId(), 'child' => $child->getId())) ?: new HierarchyLink($parent, $child);
@@ -74,10 +75,10 @@ class HierarchyImportStepBuilder extends AbstractImportStepBuilder
             return $link;
 
         } catch (\Exception $e) {
-            if ($parent !== null)
+            if ($parent !== null && $child !== null) {
                 $this->om->detach($parent);
-            if ($child !== null)
                 $this->om->detach($child);
+            }
             throw $e;
         }
     }
