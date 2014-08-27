@@ -5,6 +5,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Giosh94mhz\GeonamesBundle\Model\Import\DownloadAdapter;
 use Giosh94mhz\GeonamesBundle\Import\FileReader\TxtReader;
 use Giosh94mhz\GeonamesBundle\Entity\Country;
+use Giosh94mhz\GeonamesBundle\Entity\Toponym;
 use Giosh94mhz\GeonamesBundle\Exception\MissingToponymException;
 use Giosh94mhz\GeonamesBundle\Exception\SkipImportException;
 
@@ -58,13 +59,26 @@ class CountryImportStepBuilder extends AbstractImportStepBuilder
         if (empty($value[16]))
             throw new SkipImportException("Country '{$value[0]}' not imported because is no longer bound to a toponym");
 
+
         /* @var $toponym \Giosh94mhz\GeonamesBundle\Entity\Toponym */
-        $toponym = $this->toponymRepository->find($value[16]);
+        /*$toponym = $this->toponymRepository->find($value[16]);
         if (! $toponym)
             throw new MissingToponymException("Country '{$value[0]}' not imported due to missing toponym '{$value[16]}'");
-
+        */
         /* @var $country \Giosh94mhz\GeonamesBundle\Entity\Country */
-        $country = $this->repository->find($toponym) ?: new Country($toponym);
+        $country = $this->repository->find($value[16]); /* ?: new Country($toponym); */
+
+        if (! $country) {
+            /* @var $toponym \Giosh94mhz\GeonamesBundle\Entity\Toponym */
+            $toponym = $this->toponymRepository->find($value[16]);
+
+            if (!$toponym) {
+                $this->createFallbackToponym($value);
+                $toponym = $this->toponymRepository->find($value[16]);
+            }
+
+            $country = new Country($toponym);
+        }
 
         $languages = empty($value[15])? array() : explode(',', $value[15]);
         $neighbours = empty($value[17])? array() : explode(',', $value[17]);
@@ -91,5 +105,25 @@ class CountryImportStepBuilder extends AbstractImportStepBuilder
         ;
 
         return $country;
+    }
+
+    private function createFallbackToponym($value)
+    {
+        $toponym = new Toponym($value[16]);
+        $toponym
+            ->setName($value[4])
+            ->setAsciiName($value[4])
+            ->setFeature($this->getCountryFeature())
+            ->setLastModify(new \DateTime('1970-01-01'));
+
+        $this->om->persist($toponym);
+        $this->om->flush();
+
+        return $toponym;
+    }
+
+    private function getCountryFeature()
+    {
+        return $this->om->find('Giosh94mhzGeonamesBundle:Feature', array('class' => 'A', 'code' => 'PCLI'));
     }
 }
