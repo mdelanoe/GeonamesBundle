@@ -129,6 +129,14 @@ class Toponym implements ToponymInterface
     }
 
     /**
+     * To String
+     */
+    public function __toString()
+    {
+        return $this->id . ' - ' . $this->name;
+    }
+
+    /**
      * Set name
      *
      * @param  string  $name
