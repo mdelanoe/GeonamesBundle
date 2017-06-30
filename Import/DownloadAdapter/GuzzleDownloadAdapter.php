@@ -8,6 +8,7 @@ use GuzzleHttp\Event\CompleteEvent;
 use GuzzleHttp\Pool;
 use GuzzleHttp\Event\ProgressEvent;
 use GuzzleHttp\Event\ErrorEvent;
+use GuzzleHttp\Psr7\Request;
 
 class GuzzleDownloadAdapter extends AbstractDownloadAdapter
 {
@@ -52,10 +53,7 @@ class GuzzleDownloadAdapter extends AbstractDownloadAdapter
         if ($this->downloadsSize === null) {
             $requests = array();
             foreach ($this->requests as $request) {
-                $requests[] = $this->client->createRequest(
-                    'HEAD',
-                    $request['url']
-                );
+                $requests[] = new Request('HEAD', $request['url']);
             }
 
             $contentLength = 0;
@@ -64,7 +62,10 @@ class GuzzleDownloadAdapter extends AbstractDownloadAdapter
                     $contentLength += $event->getRequest()->getHeader('Content-Length');
                 }
             ]);
-            $pool->wait();
+
+            $promise = $pool->promise();
+
+            $promise->wait();
 
             $this->downloadsSize = $contentLength;
         }
@@ -81,24 +82,42 @@ class GuzzleDownloadAdapter extends AbstractDownloadAdapter
             );
         }
 
-        $requests = array();
-        foreach ($this->requests as $i => $r) {
-            $requests[] = $request = $this->client->createRequest(
-                'GET',
-                $r['url'],
-                array('save_to' => $r['file'])
-            );
+        $client = $this->client;
+        $requestsArray = $this->requests;
 
-            if ($progressFunctions !== null) {
-                $f = $progressFunctions[$i];
-                $request->getEmitter()->on('progress', function(ProgressEvent $event) use ($f) {
-                    call_user_func($f, $event->downloaded, $event->downloadSize);
-                });
+        $requests = function () use ($client, $requestsArray, $progressFunctions) {
+            foreach ($requestsArray as $i => $r) {
+                $filePath = $r['file'];
+                $url = $r['url'];
+
+                yield function($poolOpts) use ($client, $url, $filePath, $progressFunctions, $i) {
+                    $reqOpts = array(
+                        'sink' => $filePath,
+                    );
+
+                    if ($progressFunctions !== null) {
+                        $f = $progressFunctions[$i];
+
+                        $reqOpts['progress'] = function ($dl_total_size, $dl_size_so_far, $ul_total_size, $ul_size_so_far) use ($f) {
+                            call_user_func($f, $dl_size_so_far, $dl_total_size);
+                        };
+                    }
+
+                    if (is_array($poolOpts) && count($poolOpts) > 0) {
+                        $reqOpts = array_merge($poolOpts, $reqOpts);
+                    }
+
+                    return $client->getAsync($url, $reqOpts);
+                };
             }
-        }
+        };
 
-        $pool = new Pool($this->client, $requests);
-        $pool->wait();
+        $pool = new Pool($this->client, $requests());
+
+        $promise = $pool->promise();
+
+
+        $promise->wait();
     }
 
     public function clear()
