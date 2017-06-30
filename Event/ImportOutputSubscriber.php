@@ -3,7 +3,7 @@ namespace Giosh94mhz\GeonamesBundle\Event;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Console\Helper\ProgressHelper;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 use Giosh94mhz\GeonamesBundle\GeonamesImportEvents;
 use Symfony\Component\Stopwatch\Stopwatch;
@@ -37,7 +37,7 @@ class ImportOutputSubscriber implements EventSubscriberInterface
         );
     }
 
-    public function __construct(OutputInterface $output, ProgressHelper $progress)
+    public function __construct(OutputInterface $output, ProgressBar $progress)
     {
         $this->output = $output;
         $this->progress = $progress;
@@ -147,8 +147,8 @@ class ImportOutputSubscriber implements EventSubscriberInterface
     private function start($total)
     {
         $this->progress->setRedrawFrequency(min(max(1, $total / 1000), 10000));
-        $this->progress->start($this->output, $total);
-        $this->progress->setCurrent(0, true);
+        $this->progress->start($total);
+        $this->progress->setProgress(0, true);
         $this->onProgress = true;
     }
 
@@ -156,7 +156,7 @@ class ImportOutputSubscriber implements EventSubscriberInterface
     {
         if (! $this->onProgress)
             $this->start($total);
-        $this->progress->setCurrent($current);
+        $this->progress->setProgress($current);
     }
 
     private function finish()

@@ -12,8 +12,10 @@
 
     <services>
 
-        <service id="giosh94mhz_geonames.orm.object_manager_real" factory-service="doctrine" factory-method="getManager"
-            class="%giosh94mhz_geonames.orm.object_manager_real.class%" public="false">
+        <service id="giosh94mhz_geonames.orm.object_manager_real" class="%giosh94mhz_geonames.orm.object_manager_real.class%" public="false">
+            <factory service="doctrine"
+                method="getManager"
+            />
             <argument>%giosh94mhz_geonames.orm.object_manager_name%</argument>
         </service>
 

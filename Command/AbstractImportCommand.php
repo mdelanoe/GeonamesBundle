@@ -5,6 +5,7 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Giosh94mhz\GeonamesBundle\Event\ImportOutputSubscriber;
 use Giosh94mhz\GeonamesBundle\Model\Import\ImportDirector;
 
@@ -43,7 +44,8 @@ abstract class AbstractImportCommand extends ContainerAwareCommand
 
         $dispatcher = $container->get('event_dispatcher');
         if ($dispatcher) {
-            $outputSubscriber = new ImportOutputSubscriber($output, $this->getHelperSet()->get('progress'));
+            $progress = new ProgressBar($output);
+            $outputSubscriber = new ImportOutputSubscriber($output, $progress);
             $logger = $container->get('giosh94mhz_geonames.logger');
             if ($logger)
                 $outputSubscriber->setLogger($logger);
