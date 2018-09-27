@@ -3,7 +3,43 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <service id="Giosh94mhz\GeonamesBundle\Command\ImportAdmin1Command" class="Giosh94mhz\GeonamesBundle\Command\ImportAdmin1Command" public="true">
+            <tag name="console.command"/>
+        </service>
+
+        <service id="Giosh94mhz\GeonamesBundle\Command\ImportAdmin2Command" class="Giosh94mhz\GeonamesBundle\Command\ImportAdmin2Command" public="true">
+            <tag name="console.command"/>
+        </service>
+
+        <service id="Giosh94mhz\GeonamesBundle\Command\ImportAlternateNamesCommand" class="Giosh94mhz\GeonamesBundle\Command\ImportAlternateNamesCommand" public="true">
+            <tag name="console.command"/>
+        </service>
+
+        <service id="Giosh94mhz\GeonamesBundle\Command\ImportCommand" class="Giosh94mhz\GeonamesBundle\Command\ImportCommand" public="true">
+            <tag name="console.command"/>
+        </service>
+
+        <service id="Giosh94mhz\GeonamesBundle\Command\ImportContinentsCommand" class="Giosh94mhz\GeonamesBundle\Command\ImportContinentsCommand" public="true">
+            <tag name="console.command"/>
+        </service>
+
+        <service id="Giosh94mhz\GeonamesBundle\Command\ImportCountriesCommand" class="Giosh94mhz\GeonamesBundle\Command\ImportCountriesCommand" public="true">
+            <tag name="console.command"/>
+        </service>
+
         <service id="Giosh94mhz\GeonamesBundle\Command\ImportFeaturesCommand" class="Giosh94mhz\GeonamesBundle\Command\ImportFeaturesCommand" public="true">
+            <tag name="console.command"/>
+        </service>
+
+        <service id="Giosh94mhz\GeonamesBundle\Command\ImportHierarchyCommand" class="Giosh94mhz\GeonamesBundle\Command\ImportHierarchyCommand" public="true">
+            <tag name="console.command"/>
+        </service>
+
+        <service id="Giosh94mhz\GeonamesBundle\Command\ImportLanguagesCommand" class="Giosh94mhz\GeonamesBundle\Command\ImportLanguagesCommand" public="true">
+            <tag name="console.command"/>
+        </service>
+
+        <service id="Giosh94mhz\GeonamesBundle\Command\ImportToponymsCommand" class="Giosh94mhz\GeonamesBundle\Command\ImportToponymsCommand" public="true">
             <tag name="console.command"/>
         </service>
     </services>
