@@ -24,6 +24,7 @@ class Giosh94mhzGeonamesExtension extends Extension
 
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.xml');
+        $loader->load('commands.xml');
 
         $this->setPersistenceLayer($config, $container, $loader);
 
