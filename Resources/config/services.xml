@@ -45,6 +45,8 @@
     </parameters>
 
     <services>
+        <defaults public="true" />
+
         <service id="giosh94mhz_geonames.logger" class="Giosh94mhz\GeonamesBundle\Logger\GeonamesLogger">
             <argument type="service" id="logger" /> <!--  on-invalid="null"? -->
             <tag name="monolog.logger" channel="giosh94mhz_geonames" />
